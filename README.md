@@ -1,8 +1,22 @@
 # yii2-api
 
-Instruões de uso, configuração e detalhes da API:
+Instruções de uso, configuração e detalhes da API:
 
-1) Comando de terminal para cadastro de usuário:
+1) Configuração
+- git clone git@github.com:giosf/yii2-api.git
+- composer install
+- criar arquivo .env conforme este modelo:
+
+    DB_DSN=mysql:host=localhost;dbname=febacapital
+    DB_DATABASE=febacapital
+    DB_USERNAME=root
+    DB_PASSWORD=root
+    YII_DEBUG=true
+    YII_ENV=dev
+
+- executar ./yii serve
+
+2) Comando de terminal para cadastro de usuário:
 
 Executar o seguinte comando com 3 argumentos: nome, username e senha.
 
@@ -16,7 +30,7 @@ O script retorna uma string representando um json que contém 'access_token' 're
 
 {"access_token":"hPnljI6FU0ckYMQk19X7XuXU3XslFIsC","refresh_token":"kq0VueyK2e9QQ6zhRevS4uus6eGxxKZG","expires_in":1726602423}
 
-2) endpoints da api:
+3) endpoints da api:
 
 - GET /clients/index
 
@@ -98,6 +112,6 @@ O script retorna uma string representando um json que contém 'access_token' 're
 
     Body:
     "{
-        "username": "gasdio",
-        "password": "qwe123qwe123"
+        "username": "newusername",
+        "password": "newpassword"
     }"
