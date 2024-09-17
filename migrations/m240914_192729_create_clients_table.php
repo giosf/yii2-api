@@ -24,6 +24,18 @@ class m240914_192729_create_clients_table extends Migration
             'complement' => $this->string(255),
             'sex' => $this->string(1),
         ]);
+
+        $this->createIndex(
+            'idx-clients-name',
+            '{{%clients}}',
+            'name'
+        );
+        
+        $this->createIndex(
+            'idx-clients-city',
+            '{{%clients}}',
+            'city'
+        );
     }
 
     /**

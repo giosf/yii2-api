@@ -20,6 +20,24 @@ class m240914_193336_create_books_table extends Migration
             'price' => $this->decimal(10,2),
             'stock' => $this->integer(),
         ]);
+
+        $this->createIndex(
+            'idx-books-title',
+            '{{%books}}',
+            'title'
+        );
+
+        $this->createIndex(
+            'idx-books-price',
+            '{{%books}}',
+            'price'
+        );
+
+        $this->createIndex(
+            'idx-books-author',
+            '{{%books}}',
+            'author'
+        );
     }
 
     /**
