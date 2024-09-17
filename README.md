@@ -90,3 +90,14 @@ O script retorna uma string representando um json que contém 'access_token' 're
         "username": "nomedeusuario",
         "password": "98723498734"
     }"
+
+- GET auth/login
+
+    Request Headers:
+    key: "Accept",  value: "application/json; q=1.0, */*; q=0.1"
+
+    Body:
+    "{
+        "username": "gasdio",
+        "password": "qwe123qwe123"
+    }"
