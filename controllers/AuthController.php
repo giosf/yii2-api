@@ -16,7 +16,7 @@ class AuthController extends \yii\web\Controller
 
 		$behaviors['authenticator'] = [
 			'class' => HttpBearerAuth::className(),
-			'except' => ['signin'],
+			'except' => ['signin', 'login'],
 		];
 
 		return $behaviors;
@@ -77,11 +77,11 @@ class AuthController extends \yii\web\Controller
 
 			if ($user->save())
 			{
-				return [
+				return json_encode([
 					'access_token' => $user->access_token,
 					'refresh_token' => $user->refresh_token,
 					'expires_in' => $user->token_expire_time,
-				];
+				]);
 			}
 		}
 
