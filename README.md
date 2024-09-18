@@ -80,12 +80,12 @@ O script retorna uma string representando um json que contém 'access_token' 're
     key: "Accept",  value: "application/json; q=1.0, */*; q=0.1"
     key: "Authorization", value: "Bearer <access_token>
 
-    Body (1): Nesta opção, o sistema importa os dados de autor e título com validação de ISBN.
+    Body (1): Nesta opção, o sistema importa os dados de autor e título com validação de ISBN 13.
     {
         "isbn": "9786553629318"
     }   
 
-    Body (2): Nesta opção, os dados são inseridos manualmente com validação de ISBN
+    Body (2): Nesta opção, os dados são inseridos manualmente com validação de ISBN 13
     "{
         "isbn": "9788420634494",
         "title": "Grande Sertão Veredas",
