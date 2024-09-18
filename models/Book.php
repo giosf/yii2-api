@@ -31,9 +31,7 @@ class Book extends \yii\db\ActiveRecord
     {
         return [
             [['price'], 'number'],
-            [['price'], 'required'],
             [['stock'], 'integer'],
-            [['stock'], 'required'],
             [['title', 'author'], 'string', 'max' => 255],
             [['isbn'], 'string', 'max' => 13],
             [['isbn'], 'unique'],
