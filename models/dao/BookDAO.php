@@ -22,59 +22,56 @@ class BookDAO extends Book
 
     public function create($params)
     {
+        Yii::$app->response->format = 'json';
         $model = new Book();
-        $inexistentParams = array_diff_key($params, $model->attributeLabels());
-
-        if(count($inexistentParams))
-        {
-            $response = Yii::$app->response;
-            $response->statusCode = 400;
-            $response->content = 'Invalid attributes: ' . implode(' - ' , array_keys($inexistentParams));
-            $response->format = \yii\web\Response::FORMAT_JSON;
-
-            return $response;
-        }
-
-        $model->attributes = $params;
-
-        if (!$model->validate())
-        {
-            $errors = $model->errors;
-            $content = '';
-            foreach(array_keys($errors) as $key)
-            {
-                $content .= $key . ': ' . implode(',', $errors[$key]) . ' ';
-            }
-            $response = Yii::$app->response;
-            $response->statusCode = 400;
-            $response->format = \yii\web\Response::FORMAT_JSON;
-            $response->content = json_encode(['message' => 'Invalid attributes: ' . $content]);
-
-            return $response;
-        }
-
         $existingISBN = Book::find()->andFilterWhere(['isbn' => $params['isbn']])->all();
+
         if(count($existingISBN))
         {
-            $response = Yii::$app->response;
-            $response->statusCode = 400;
-            $response->content = json_encode(['message' => 'ISBN has already been taken']);
-            $response->format = \yii\web\Response::FORMAT_JSON;
-
-            return $response;
+            throw new BadRequestHttpException('ISBN has already been taken');
         }
 
-        $curl = new curl\Curl();
-        $response = json_decode($curl->get('https://brasilapi.com.br/api/isbn/v1/' . $params['isbn']));
-        if(isset($response->message))
+        if(count($params) == 1 && isset($params['isbn']))
         {
-            $curlMessage = $response->message;
-            $response = Yii::$app->response;
-            $response->statusCode = 400;
-            $response->content = json_encode(['message' => $curlMessage]);
-            $response->format = \yii\web\Response::FORMAT_JSON;
+            $curl = new curl\Curl();
+            $response = json_decode($curl->get('https://brasilapi.com.br/api/isbn/v1/' . $params['isbn']));
+            if(isset($response->message))
+            {
+                throw new BadRequestHttpException($response->message);
+            }
+            else
+            {
+                $bookData = [
+                    'isbn' => $params['isbn'],
+                    'author' => implode(',', $response->authors),
+                    'title' => $response->title,
+                ];
 
-            return $response;
+                $model->attributes = $bookData;
+            }    
+        }
+        else
+        {
+            $inexistentParams = array_diff_key($params, $model->attributeLabels());
+
+            if(count($inexistentParams))
+            {
+                throw new BadRequestHttpException('Invalid attributes: ' . implode(' - ' , array_keys($inexistentParams)));
+            }
+    
+            $model->attributes = $params;
+    
+            if (!$model->validate())
+            {
+                $errors = $model->errors;
+                $content = '';
+                foreach(array_keys($errors) as $key)
+                {
+                    $content .= $key . ': ' . implode(',', $errors[$key]) . ' ';
+                }
+    
+                throw new BadRequestHttpException('Invalid attributes: ' . $content);
+            }    
         }
 
         if ($model->save())
@@ -88,36 +85,24 @@ class BookDAO extends Book
         }
         else
         {
-            $response = Yii::$app->response;
-            $response->statusCode = 500;
-            $response->content = "Resource not created";
-            $response->format = \yii\web\Response::FORMAT_JSON;
-
-            return $response;
+            throw new ServerErrorHttpException("Resource not created");
         }
     }
 
     public function search($params)
     {
+        Yii::$app->response->format = 'json';
         foreach ($params as $key => $value)
         {
-            $response = Yii::$app->response;
-            $response->statusCode = 400;
-            $response->format = \yii\web\Response::FORMAT_JSON;
-
             if (!in_array($key, $this->getFields()) && !in_array($key, ['sort']))
             {
-                $response->content = "Invalid parameter: $key";
-
-                return $response;
+                throw new BadRequestHttpException("Invalid parameter: $key");
             }
 
             if ($key === 'sort' &&
                 !in_array($value, $this->getFields()['sort']))
             {
-                $response->content = "Invalid sort parameter value: $value";
-
-                return $response;
+                throw new BadRequestHttpException("Invalid sort parameter value: $value");
             }
         }
 
@@ -146,12 +131,7 @@ class BookDAO extends Book
             }
             else
             {
-                $response = Yii::$app->response;
-                $response->statusCode = 400;
-                $response->content = 'Sort parameter not available';
-                $response->format = \yii\web\Response::FORMAT_JSON;
-
-                return $response;
+                throw new BadRequestHttpException('Sort parameter not available');
             }
         }
 
@@ -175,6 +155,8 @@ class BookDAO extends Book
             'isbn',
             'title',
             'author',
+            'resultsPerPage',
+            'page'
         ];
     }
 }
